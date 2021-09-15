@@ -1,2 +1,2 @@
-# android_openssl-3.0.0
+# Build openssl for Adroid
 Ready assemblies and script for self-assembly
