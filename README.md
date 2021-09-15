@@ -1,2 +1,2 @@
 # Build openssl for Adroid
-Ready assemblies and script for self-assembly
+These builds are good for building projects for Android that require openssl. For example, tdlib.
