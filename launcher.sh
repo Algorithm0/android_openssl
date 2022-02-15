@@ -9,18 +9,6 @@ ANDROID_API=$1
 # Can be android-arm, android-arm64, android-x86, android-x86 etc
 architecture=$2
 
-if [[ "$architecture" == android-arm ]]
-then arcName=arm-linux-androideabi
-elif [[ "$architecture" == android-arm64 ]]
-then arcName=aarch64-linux-android
-elif [[ "$architecture" == android-x86 ]]
-then arcName=i686-linux-android
-elif [[ "$architecture" == android-x86_64 ]]
-then arcName=x86_64-linux-android
-else
-arcName="$architecture"
-fi
-
 # Set directory
 SCRIPTPATH=`realpath .`
 export ANDROID_NDK_ROOT=$SCRIPTPATH/android-ndk-r23
@@ -54,9 +42,31 @@ cd ${OPENSSL_DIR}
 # Build
 make -j8
 
+if ("${ANDROID_ABI}" STREQUAL "x86")
+  set(arcName i686-linux-android)
+elseif("${ANDROID_ABI}" STREQUAL "armeabi-v7a")
+  set(arcName arm-linux-androideabi)
+elseif("${ANDROID_ABI}" STREQUAL "arm64-v8a")
+  set(arcName aarch64-linux-android)
+elseif("${ANDROID_ABI}" STREQUAL "x86_64")
+  set(arcName x86_64-linux-android)
+endif()
+
+if [[ "$architecture" == android-arm ]]
+then arcName=armeabi-v7a
+elif [[ "$architecture" == android-arm64 ]]
+then arcName=arm64-v8a
+elif [[ "$architecture" == android-x86 ]]
+then arcName=x86
+elif [[ "$architecture" == android-x86_64 ]]
+then arcName=x86_64
+else
+arcName="$architecture"
+fi
+
 # Copy the outputs
 OUTPUT_INCLUDE=$SCRIPTPATH/outputStatic/include
-OUTPUT_LIB=$SCRIPTPATH/outputStatic/lib/${arcName}/${ANDROID_API}
+OUTPUT_LIB=$SCRIPTPATH/outputStatic/lib/${ANDROID_API}/${arcName}
 mkdir -p $OUTPUT_INCLUDE
 mkdir -p $OUTPUT_LIB
 cp -RL include/openssl $OUTPUT_INCLUDE
