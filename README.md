@@ -18,11 +18,11 @@ Run the script to do the default build:
 ```
 In this case, the script will use the default parameters.
 You can change the default options by specifying them on the command line in order:
--1 - path/to/your/ndk (no def)
--2 - architecture (def: android-arm) Can be android-arm, android-arm64, android-x86, android-x86 etc
--3 - ANDROID_API (def: 28)
--4 - dir with ready lib and headers (def: SCRIPTPATH/output)
--5 - OPENSSL_DIR or where you want to place it (def: SCRIPTPATH/openssl)
+- 1 - path/to/your/ndk (no def)
+- 2 - architecture (def: android-arm) Can be android-arm, android-arm64, android-x86, android-x86 etc
+- 3 - ANDROID_API (def: 28)
+- 4 - dir with ready lib and headers (def: SCRIPTPATH/output)
+- 5 - OPENSSL_DIR or where you want to place it (def: SCRIPTPATH/openssl)
 You can specify both absolute and relative paths. If the script does not find the specified OPENSSL_DIR, then it will automatically download the [sources](https://github.com/openssl/openssl.git) for the `openssl-3.0.0` tag.
 You will get the assembly in the form of this tree:
 ```
@@ -40,10 +40,10 @@ To do this, you need to run another script:
 ./lazzy.sh path/to/your/ndk
 ```
 The parameters of this script are similar to the parameters of the previous one:
--1 - path/to/your/ndk (no def)
--2 - ANDROID_API (def: 28)
--3 - dir with ready lib and headers (def: SCRIPTPATH/output)
--4 - OPENSSL_DIR or where you want to place it (def: SCRIPTPATH/openssl)
+- 1 - path/to/your/ndk (no def)
+- 2 - ANDROID_API (def: 28)
+- 3 - dir with ready lib and headers (def: SCRIPTPATH/output)
+- 4 - OPENSSL_DIR or where you want to place it (def: SCRIPTPATH/openssl)
 You will get the assembly in the form of this tree:
 ```
 Your output dir
