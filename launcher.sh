@@ -2,28 +2,35 @@
 set -e
 set -x
 
-# Set the Android API levels
-ANDROID_API=$1
+# Set directory
+SCRIPTPATH=`realpath .`
+
+export ANDROID_NDK_ROOT=`readlink -m $1`
 
 # Set the target architecture
 # Can be android-arm, android-arm64, android-x86, android-x86 etc
-architecture=$2
+architecture=${2:-android-arm}
 
-# Set directory
-SCRIPTPATH=`realpath .`
-export ANDROID_NDK_ROOT=$SCRIPTPATH/android-ndk-r23
-OPENSSL_DIR=$SCRIPTPATH/openssl
+# Set the Android API levels
+ANDROID_API=${3:-28}
+
+TARGET_DIR=${4:-$SCRIPTPATH/output}
+if [[ "$TARGET_DIR" != $SCRIPTPATH/output ]]
+then TARGET_DIR=`readlink -m $TARGET_DIR`
+fi
+
+OPENSSL_DIR=${5:-$SCRIPTPATH/openssl}
+if [[ "$OPENSSL_DIR" != $SCRIPTPATH/openssl ]]
+then OPENSSL_DIR=`readlink -m $OPENSSL_DIR`
+fi
 
 if ! [ -d $OPENSSL_DIR ]; then
-git clone https://github.com/openssl/openssl.git -b openssl-3.0.0
+git clone https://github.com/openssl/openssl.git -b openssl-3.0.0 ${OPENSSL_DIR}
 else
 cd ${OPENSSL_DIR}
 git clean -fdx
 cd ${SCRIPTPATH}
 fi
-
-# Get opessl from git
-# git clone https://github.com/openssl/openssl.git -b openssl-3.0.0
 
 # Find the toolchain for your build machine
 toolchains_path=$(python3 toolchains_path.py --ndk ${ANDROID_NDK_ROOT})
@@ -42,16 +49,6 @@ cd ${OPENSSL_DIR}
 # Build
 make -j8
 
-if ("${ANDROID_ABI}" STREQUAL "x86")
-  set(arcName i686-linux-android)
-elseif("${ANDROID_ABI}" STREQUAL "armeabi-v7a")
-  set(arcName arm-linux-androideabi)
-elseif("${ANDROID_ABI}" STREQUAL "arm64-v8a")
-  set(arcName aarch64-linux-android)
-elseif("${ANDROID_ABI}" STREQUAL "x86_64")
-  set(arcName x86_64-linux-android)
-endif()
-
 if [[ "$architecture" == android-arm ]]
 then arcName=armeabi-v7a
 elif [[ "$architecture" == android-arm64 ]]
@@ -65,12 +62,15 @@ arcName="$architecture"
 fi
 
 # Copy the outputs
-OUTPUT_INCLUDE=$SCRIPTPATH/outputStatic/include
-OUTPUT_LIB=$SCRIPTPATH/outputStatic/lib/${ANDROID_API}/${arcName}
+OUTPUT_INCLUDE=$TARGET_DIR/include
+OUTPUT_LIB=$TARGET_DIR/lib/${ANDROID_API}/${arcName}
 mkdir -p $OUTPUT_INCLUDE
 mkdir -p $OUTPUT_LIB
-cp -RL include/openssl $OUTPUT_INCLUDE
-cp libcrypto.so $OUTPUT_LIB
-cp libcrypto.a $OUTPUT_LIB
-cp libssl.so $OUTPUT_LIB
-cp libssl.a $OUTPUT_LIB
+cp -RL ${OPENSSL_DIR}/include/openssl $OUTPUT_INCLUDE
+cp ${OPENSSL_DIR}/libcrypto.so $OUTPUT_LIB
+cp ${OPENSSL_DIR}/libcrypto.a $OUTPUT_LIB
+cp ${OPENSSL_DIR}/libssl.so $OUTPUT_LIB
+cp ${OPENSSL_DIR}/libssl.a $OUTPUT_LIB
+
+# Clen openssl dir from build files
+git clean -fdx
